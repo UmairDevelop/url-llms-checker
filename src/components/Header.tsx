@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Menu, Github } from "lucide-react";
+import { Menu } from "lucide-react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const Header = () => {
   return (
@@ -19,19 +20,18 @@ export const Header = () => {
           <Button variant="ghost" size="sm">
             How it Works
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => window.open('https://github.com', '_blank')}
-          >
-            <Github className="h-4 w-4 mr-2" />
-            GitHub
+          <Button variant="ghost" size="sm">
+            Resources
           </Button>
+          <ThemeToggle />
         </div>
 
-        <Button variant="ghost" size="sm" className="md:hidden">
-          <Menu className="h-4 w-4" />
-        </Button>
+        <div className="flex md:hidden items-center gap-2">
+          <ThemeToggle />
+          <Button variant="ghost" size="sm">
+            <Menu className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </header>
   );

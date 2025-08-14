@@ -28,10 +28,10 @@ export const SupportButtons = () => {
         variant="outline"
         size="sm"
         className="border-primary/20 hover:bg-primary/5 transition-smooth"
-        onClick={() => window.open('https://github.com', '_blank')}
+        onClick={() => window.open('https://reddit.com/r/llmstxt', '_blank')}
       >
         <Heart className="h-4 w-4 mr-2" />
-        Support on GitHub
+        Join Community
       </Button>
     </div>
   );

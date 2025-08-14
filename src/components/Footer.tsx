@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Github, Twitter, Heart } from "lucide-react";
+import { Twitter, Heart } from "lucide-react";
 
 export const Footer = () => {
   return (
@@ -39,9 +39,9 @@ export const Footer = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => window.open('https://github.com', '_blank')}
+                onClick={() => window.open('https://reddit.com/r/llmstxt', '_blank')}
               >
-                <Github className="h-4 w-4" />
+                Reddit
               </Button>
               <Button 
                 variant="outline" 
