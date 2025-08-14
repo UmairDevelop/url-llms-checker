@@ -34,49 +34,133 @@ export const LLMSValidator = () => {
       const baseUrl = normalizedUrl.replace(/\/$/, '');
       const llmsTxtUrl = `${baseUrl}/llms.txt`;
 
-      // Try to fetch the LLMS.txt file
-      const response = await fetch(llmsTxtUrl, {
-        method: 'HEAD',
-        mode: 'no-cors'
-      });
+      console.log('Checking LLMS.txt at:', llmsTxtUrl);
 
-      // Since we're using no-cors, we can't read the actual status
-      // We'll use a different approach with a proxy or direct fetch
-      try {
-        const directResponse = await fetch(llmsTxtUrl);
-        setResult({
-          exists: directResponse.ok,
-          url: llmsTxtUrl,
-          status: directResponse.status
-        });
+      // Try multiple CORS proxy services for better reliability
+      const corsProxies = [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?',
+        'https://cors-anywhere.herokuapp.com/',
+      ];
 
-        if (directResponse.ok) {
-          toast({
-            title: "✅ LLMS.txt Found!",
-            description: `Valid LLMS.txt file exists at ${llmsTxtUrl}`,
+      let lastError = '';
+      let success = false;
+
+      for (const proxy of corsProxies) {
+        try {
+          console.log(`Trying proxy: ${proxy}`);
+          const proxyUrl = `${proxy}${encodeURIComponent(llmsTxtUrl)}`;
+          
+          const response = await fetch(proxyUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/plain',
+            },
           });
-        } else {
+
+          console.log(`Response status: ${response.status}`);
+
+          if (response.ok) {
+            const content = await response.text();
+            console.log('LLMS.txt content found:', content.substring(0, 100) + '...');
+            
+            setResult({
+              exists: true,
+              url: llmsTxtUrl,
+              status: response.status
+            });
+
+            toast({
+              title: "✅ LLMS.txt Found!",
+              description: `Valid LLMS.txt file exists at ${llmsTxtUrl}`,
+            });
+            
+            success = true;
+            break;
+          } else if (response.status === 404) {
+            console.log('LLMS.txt not found (404)');
+            setResult({
+              exists: false,
+              url: llmsTxtUrl,
+              status: 404
+            });
+
+            toast({
+              title: "❌ LLMS.txt Not Found",
+              description: `No LLMS.txt file found at ${llmsTxtUrl}`,
+              variant: "destructive",
+            });
+            
+            success = true;
+            break;
+          } else {
+            lastError = `HTTP ${response.status}`;
+            continue;
+          }
+        } catch (proxyError) {
+          console.log(`Proxy ${proxy} failed:`, proxyError);
+          lastError = proxyError instanceof Error ? proxyError.message : 'Proxy request failed';
+          continue;
+        }
+      }
+
+      if (!success) {
+        // All proxies failed, try one more approach with a different service
+        try {
+          console.log('Trying alternative validation method...');
+          const altResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(llmsTxtUrl)}`);
+          
+          if (altResponse.ok) {
+            const data = await altResponse.json();
+            
+            if (data.status.http_code === 200) {
+              setResult({
+                exists: true,
+                url: llmsTxtUrl,
+                status: 200
+              });
+
+              toast({
+                title: "✅ LLMS.txt Found!",
+                description: `Valid LLMS.txt file exists at ${llmsTxtUrl}`,
+              });
+            } else if (data.status.http_code === 404) {
+              setResult({
+                exists: false,
+                url: llmsTxtUrl,
+                status: 404
+              });
+
+              toast({
+                title: "❌ LLMS.txt Not Found",
+                description: `No LLMS.txt file found at ${llmsTxtUrl}`,
+                variant: "destructive",
+              });
+            } else {
+              throw new Error(`HTTP ${data.status.http_code}`);
+            }
+          } else {
+            throw new Error('Alternative validation failed');
+          }
+        } catch (altError) {
+          console.log('Alternative method failed:', altError);
+          
+          setResult({
+            exists: false,
+            url: llmsTxtUrl,
+            error: `Unable to verify: ${lastError}. This could be due to server restrictions or the website blocking automated requests.`
+          });
+
           toast({
-            title: "❌ LLMS.txt Not Found",
-            description: `No LLMS.txt file found at ${llmsTxtUrl}`,
+            title: "⚠️ Unable to Verify",
+            description: "Could not verify LLMS.txt due to network restrictions. Please check manually by visiting the URL.",
             variant: "destructive",
           });
         }
-      } catch (corsError) {
-        // Fallback for CORS issues - we'll assume it might exist but can't verify
-        setResult({
-          exists: false,
-          url: llmsTxtUrl,
-          error: "Unable to verify due to CORS restrictions. Please check manually."
-        });
-
-        toast({
-          title: "⚠️ Unable to Verify",
-          description: "CORS restrictions prevent automatic verification. Please check the URL manually.",
-          variant: "destructive",
-        });
       }
+
     } catch (error) {
+      console.error('Validation error:', error);
       setResult({
         exists: false,
         url: url,
