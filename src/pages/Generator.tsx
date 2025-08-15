@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RedditBar } from "@/components/RedditBar";
+import { SupportButtons } from "@/components/SupportButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -239,6 +240,8 @@ const Generator = () => {
             </CardContent>
           </Card>
         </div>
+        
+        <SupportButtons />
       </main>
       <Footer />
     </div>

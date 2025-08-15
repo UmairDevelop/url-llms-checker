@@ -34,6 +34,32 @@ export const Header = () => {
           >
             <Link to="/generator">Generator</Link>
           </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => {
+              if (location.pathname === '/') {
+                document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                window.location.href = '/#info-section';
+              }
+            }}
+          >
+            About
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => {
+              if (location.pathname === '/') {
+                document.getElementById('how-to-check')?.scrollIntoView({ behavior: 'smooth' });
+              } else {
+                window.location.href = '/#how-to-check';
+              }
+            }}
+          >
+            How it Works
+          </Button>
           <ThemeToggle />
         </div>
 
@@ -62,6 +88,34 @@ export const Header = () => {
                   onClick={() => setIsOpen(false)}
                 >
                   <Link to="/generator">Generator</Link>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (location.pathname === '/') {
+                      setTimeout(() => document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                    } else {
+                      window.location.href = '/#info-section';
+                    }
+                  }}
+                >
+                  About
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => {
+                    setIsOpen(false);
+                    if (location.pathname === '/') {
+                      setTimeout(() => document.getElementById('how-to-check')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                    } else {
+                      window.location.href = '/#how-to-check';
+                    }
+                  }}
+                >
+                  How it Works
                 </Button>
               </div>
             </SheetContent>
