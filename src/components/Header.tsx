@@ -14,7 +14,7 @@ export const Header = () => {
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img 
-            src="/lovable-uploads/113c6295-5d65-43a2-ad8c-3b91cbaead1b.png" 
+            src="/lovable-uploads/0acd8fcf-ad8b-4d66-92a4-40994937b537.png" 
             alt="ezllmstxt.com" 
             className="h-8 w-auto"
           />
@@ -36,30 +36,18 @@ export const Header = () => {
             <Link to="/generator">Generator</Link>
           </Button>
           <Button 
-            variant="ghost" 
+            variant={location.pathname === '/about' ? 'default' : 'ghost'} 
             size="sm" 
-            onClick={() => {
-              if (location.pathname === '/') {
-                document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' });
-              } else {
-                window.location.href = '/#info-section';
-              }
-            }}
+            asChild
           >
-            About
+            <Link to="/about">About</Link>
           </Button>
           <Button 
-            variant="ghost" 
+            variant={location.pathname === '/how-it-works' ? 'default' : 'ghost'} 
             size="sm" 
-            onClick={() => {
-              if (location.pathname === '/') {
-                document.getElementById('how-to-check')?.scrollIntoView({ behavior: 'smooth' });
-              } else {
-                window.location.href = '/#how-to-check';
-              }
-            }}
+            asChild
           >
-            How it Works
+            <Link to="/how-it-works">How it Works</Link>
           </Button>
           <ThemeToggle />
         </div>
@@ -91,32 +79,20 @@ export const Header = () => {
                   <Link to="/generator">Generator</Link>
                 </Button>
                 <Button 
-                  variant="ghost" 
+                  variant={location.pathname === '/about' ? 'default' : 'ghost'} 
                   size="sm" 
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (location.pathname === '/') {
-                      setTimeout(() => document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                    } else {
-                      window.location.href = '/#info-section';
-                    }
-                  }}
+                  asChild
+                  onClick={() => setIsOpen(false)}
                 >
-                  About
+                  <Link to="/about">About</Link>
                 </Button>
                 <Button 
-                  variant="ghost" 
+                  variant={location.pathname === '/how-it-works' ? 'default' : 'ghost'} 
                   size="sm" 
-                  onClick={() => {
-                    setIsOpen(false);
-                    if (location.pathname === '/') {
-                      setTimeout(() => document.getElementById('how-to-check')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                    } else {
-                      window.location.href = '/#how-to-check';
-                    }
-                  }}
+                  asChild
+                  onClick={() => setIsOpen(false)}
                 >
-                  How it Works
+                  <Link to="/how-it-works">How it Works</Link>
                 </Button>
               </div>
             </SheetContent>
