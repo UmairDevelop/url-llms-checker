@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Generator from "./pages/Generator";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
+import Donate from "./pages/Donate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/generator" element={<Generator />} />
             <Route path="/about" element={<About />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/donate" element={<Donate />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
