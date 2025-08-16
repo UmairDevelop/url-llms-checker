@@ -43,18 +43,22 @@ const Generator = () => {
 # This file specifies how AI systems should interact with this website's content
 
 ## Training Data Usage
-# Specify whether your content can be used for AI training
+# Specify whether your content can be used for AI training and research
 < User-agent: *
-< Allow-training: no
+< Allow-training: yes
+< Allow-research: yes
 < 
 < User-agent: GPTBot
-< Allow-training: no
+< Allow-training: yes
+< Allow-research: yes
 < 
 < User-agent: Claude-Web
-< Allow-training: no
+< Allow-training: yes
+< Allow-research: yes
 < 
 < User-agent: Bard
-< Allow-training: no
+< Allow-training: yes
+< Allow-research: yes
 
 ## Content Licensing
 # This content is subject to the following license terms:

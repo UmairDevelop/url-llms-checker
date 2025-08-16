@@ -13,10 +13,11 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-hero-gradient flex items-center justify-center">
-            <span className="text-white font-bold text-sm">L</span>
-          </div>
-          <span className="font-bold text-xl">LLMS.txt Validator</span>
+          <img 
+            src="/lovable-uploads/113c6295-5d65-43a2-ad8c-3b91cbaead1b.png" 
+            alt="ezllmstxt.com" 
+            className="h-8 w-auto"
+          />
         </Link>
 
         <div className="hidden md:flex items-center gap-4">

@@ -3,15 +3,20 @@ import { FileText, Shield, Bot, Globe } from "lucide-react";
 
 export const InfoSection = () => {
   return (
-    <section className="py-16 px-4 bg-muted/30">
+    <section id="info-section" className="py-16 px-4 bg-muted/30">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            What is LLMS.txt?
+            About ezllmstxt.com
           </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
+            We're pioneering the future of AI-content interaction through LLMS.txt validation and generation. 
+            Our platform empowers website owners to take control of how AI systems interact with their content.
+          </p>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            LLMS.txt is a proposed standard for websites to communicate their AI training data policies, 
-            content licensing, and usage permissions to Large Language Models and AI systems.
+            In the age of AI, we're committed to changing how content is ranked and accessed. Just as robots.txt 
+            became the standard for web crawlers, LLMS.txt is emerging as the new standard for AI systems - 
+            enabling transparent, respectful AI-content relationships.
           </p>
         </div>
 
@@ -49,58 +54,78 @@ export const InfoSection = () => {
           </Card>
         </div>
 
-        <Card className="p-8 border-0 shadow-elegant">
-          <h3 className="text-2xl font-bold mb-6">How to Check for LLMS.txt</h3>
-          <div className="space-y-6">
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
-                1
+        <div id="how-to-check" className="mt-16">
+          <h3 className="text-2xl md:text-3xl font-bold text-center mb-8">
+            How It Works
+          </h3>
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <Card className="p-6 border-0 shadow-elegant">
+              <h4 className="text-xl font-bold mb-4 text-primary">Validate Existing LLMS.txt</h4>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary-foreground font-bold text-sm">1</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">Enter Website URL</h5>
+                    <p className="text-sm text-muted-foreground">Input any website URL into our validation tool</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary-foreground font-bold text-sm">2</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">Automatic Check</h5>
+                    <p className="text-sm text-muted-foreground">Our system scans for LLMS.txt file at domain.com/llms.txt</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary-foreground font-bold text-sm">3</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">Get Results</h5>
+                    <p className="text-sm text-muted-foreground">See validation status and review the content policies</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h4 className="font-semibold mb-2">Enter Website URL</h4>
-                <p className="text-muted-foreground">
-                  Type the website URL you want to check. You can enter it with or without the protocol (http/https).
-                </p>
+            </Card>
+            
+            <Card className="p-6 border-0 shadow-elegant">
+              <h4 className="text-xl font-bold mb-4 text-primary">Generate New LLMS.txt</h4>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary-foreground font-bold text-sm">1</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">Use Our Generator</h5>
+                    <p className="text-sm text-muted-foreground">Visit our LLMS.txt generator and enter your website URL</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary-foreground font-bold text-sm">2</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">Download File</h5>
+                    <p className="text-sm text-muted-foreground">Generate and download your customized LLMS.txt file</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-primary-foreground font-bold text-sm">3</span>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold">Upload to Website</h5>
+                    <p className="text-sm text-muted-foreground">Place the file in your website's root directory as llms.txt</p>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
-                2
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Automatic Validation</h4>
-                <p className="text-muted-foreground">
-                  Our tool automatically checks for the presence of an LLMS.txt file at the root domain (website.com/llms.txt).
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
-                3
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Get Results</h4>
-                <p className="text-muted-foreground">
-                  Receive instant feedback on whether the website has implemented LLMS.txt and can access the file directly.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
-                4
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2">Review Content</h4>
-                <p className="text-muted-foreground">
-                  If found, you can click the link to review the actual LLMS.txt content and understand the website's AI policies.
-                </p>
-              </div>
-            </div>
+            </Card>
           </div>
-        </Card>
+        </div>
       </div>
     </section>
   );
