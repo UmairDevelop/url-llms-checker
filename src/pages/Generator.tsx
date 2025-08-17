@@ -37,51 +37,33 @@ const Generator = () => {
     // Simulate generation process
     setTimeout(() => {
       const domain = new URL(websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`).hostname;
+      const siteName = domain.replace('www.', '').split('.')[0];
+      const capitalizedSiteName = siteName.charAt(0).toUpperCase() + siteName.slice(1);
       
-      const content = `# LLMS.txt for ${domain}
+      const content = `# ${domain}
 
-# This file specifies how AI systems should interact with this website's content
+> ${capitalizedSiteName} provides valuable content and resources for our users. This file helps AI systems discover our most important and useful content.
 
-## Training Data Usage
-# Specify whether your content can be used for AI training and research
-< User-agent: *
-< Allow-training: yes
-< Allow-research: yes
-< 
-< User-agent: GPTBot
-< Allow-training: yes
-< Allow-research: yes
-< 
-< User-agent: Claude-Web
-< Allow-training: yes
-< Allow-research: yes
-< 
-< User-agent: Bard
-< Allow-training: yes
-< Allow-research: yes
+## Main Content
+- [Home Page](${websiteUrl}): Main landing page with site overview
+- [About Us](${websiteUrl}/about): Information about our mission and team
+- [Blog](${websiteUrl}/blog): Latest articles and insights
+- [Resources](${websiteUrl}/resources): Helpful guides and documentation
 
-## Content Licensing
-# This content is subject to the following license terms:
-# © ${new Date().getFullYear()} ${domain}. All rights reserved.
-# 
-# Commercial use: Prohibited without permission
-# Academic use: Allowed with attribution
-# Personal use: Allowed
-# 
-# For licensing inquiries, contact: legal@${domain}
+## Products & Services
+- [Our Services](${websiteUrl}/services): Overview of what we offer
+- [Product Catalog](${websiteUrl}/products): Complete list of our products
+- [Pricing](${websiteUrl}/pricing): Current pricing information
 
-## Contact Information
-# For questions about this LLMS.txt file:
-# Email: contact@${domain}
-# Website: ${websiteUrl}
+## Support & Contact
+- [Contact Us](${websiteUrl}/contact): Get in touch with our team
+- [FAQ](${websiteUrl}/faq): Frequently asked questions
+- [Help Center](${websiteUrl}/help): Support documentation and guides
 
-## Last Updated
-# ${new Date().toISOString().split('T')[0]}
-
-## Additional Notes
-# This website's content is protected by copyright law.
-# AI systems should respect these usage guidelines.
-# For custom licensing arrangements, please contact us directly.`;
+## Optional
+- [Privacy Policy](${websiteUrl}/privacy): Our privacy commitments
+- [Terms of Service](${websiteUrl}/terms): Usage terms and conditions
+- [Sitemap](${websiteUrl}/sitemap): Complete site navigation`;
 
       setGeneratedContent(content);
       setIsGenerating(false);
