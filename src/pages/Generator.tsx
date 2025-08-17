@@ -22,7 +22,7 @@ const Generator = () => {
     updateSEO(pageSEO.generator);
   }, []);
 
-  const generateLLMSTxt = () => {
+  const generateLLMSTxt = async () => {
     if (!websiteUrl.trim()) {
       toast({
         title: "URL Required",
@@ -34,36 +34,104 @@ const Generator = () => {
 
     setIsGenerating(true);
     
-    // Simulate generation process
-    setTimeout(() => {
-      const domain = new URL(websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`).hostname;
+    try {
+      const normalizedUrl = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
+      const baseUrl = normalizedUrl.endsWith('/') ? normalizedUrl.slice(0, -1) : normalizedUrl;
+      const domain = new URL(baseUrl).hostname;
       const siteName = domain.replace('www.', '').split('.')[0];
       const capitalizedSiteName = siteName.charAt(0).toUpperCase() + siteName.slice(1);
       
-      const content = `# ${domain}
+      // Try to fetch the website to discover actual content
+      let discoveredLinks: { title: string; url: string; description: string }[] = [];
+      
+      try {
+        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(baseUrl)}`);
+        if (response.ok) {
+          const html = await response.text();
+          
+          // Extract navigation links and common pages
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const links = Array.from(doc.querySelectorAll('a[href]'));
+          
+          const commonPages = ['about', 'blog', 'contact', 'services', 'products', 'resources', 'help', 'faq', 'pricing'];
+          const foundPages: { title: string; url: string; description: string }[] = [];
+          
+          // Look for common pages in navigation
+          links.forEach(link => {
+            const href = link.getAttribute('href');
+            const text = link.textContent?.trim() || '';
+            
+            if (href && text && href.length > 1) {
+              const fullUrl = href.startsWith('http') ? href : 
+                            href.startsWith('/') ? `${baseUrl}${href}` : 
+                            `${baseUrl}/${href}`;
+              
+              // Check if it's a page we're interested in
+              const pageName = href.toLowerCase().replace(/^\//, '').split('/')[0];
+              if (commonPages.includes(pageName) || text.toLowerCase().includes('about') || 
+                  text.toLowerCase().includes('contact') || text.toLowerCase().includes('blog')) {
+                foundPages.push({
+                  title: text,
+                  url: fullUrl,
+                  description: `${text} page`
+                });
+              }
+            }
+          });
+          
+          // Remove duplicates and limit to reasonable number
+          const uniquePages = foundPages.filter((page, index, arr) => 
+            arr.findIndex(p => p.url.toLowerCase() === page.url.toLowerCase()) === index
+          ).slice(0, 8);
+          
+          discoveredLinks = uniquePages;
+        }
+      } catch (fetchError) {
+        console.warn('Could not fetch website content for analysis:', fetchError);
+      }
+      
+      // Generate content based on discovered links or fallback to basic structure
+      let content = `# ${domain}
 
-> ${capitalizedSiteName} provides valuable content and resources for our users. This file helps AI systems discover our most important and useful content.
+> ${capitalizedSiteName} provides valuable content and resources. This file helps AI systems discover important content on this website.
 
-## Main Content
-- [Home Page](${websiteUrl}): Main landing page with site overview
-- [About Us](${websiteUrl}/about): Information about our mission and team
-- [Blog](${websiteUrl}/blog): Latest articles and insights
-- [Resources](${websiteUrl}/resources): Helpful guides and documentation
+`;
 
-## Products & Services
-- [Our Services](${websiteUrl}/services): Overview of what we offer
-- [Product Catalog](${websiteUrl}/products): Complete list of our products
-- [Pricing](${websiteUrl}/pricing): Current pricing information
+      if (discoveredLinks.length > 0) {
+        content += `## Discovered Content
+- [Home Page](${baseUrl}): Main landing page
+`;
+        discoveredLinks.forEach(link => {
+          content += `- [${link.title}](${link.url}): ${link.description}\n`;
+        });
+        
+        content += `
+## Note
+This content was automatically discovered from your website. Please review and customize the descriptions and add any additional important pages that may have been missed.`;
+      } else {
+        content += `## Main Content
+- [Home Page](${baseUrl}): Main landing page with site overview
 
-## Support & Contact
-- [Contact Us](${websiteUrl}/contact): Get in touch with our team
-- [FAQ](${websiteUrl}/faq): Frequently asked questions
-- [Help Center](${websiteUrl}/help): Support documentation and guides
+## Important Note
+⚠️ **Please customize this template!**
 
-## Optional
-- [Privacy Policy](${websiteUrl}/privacy): Our privacy commitments
-- [Terms of Service](${websiteUrl}/terms): Usage terms and conditions
-- [Sitemap](${websiteUrl}/sitemap): Complete site navigation`;
+The following are common page examples. Replace them with your actual website pages and content:
+
+- [About Us](${baseUrl}/about): Information about your mission and team
+- [Contact](${baseUrl}/contact): How to get in touch with you
+
+## Additional Pages
+Add links to your most important content here:
+- [Your Important Page 1](${baseUrl}/page1): Description of the content
+- [Your Important Page 2](${baseUrl}/page2): Description of the content
+
+## Instructions
+1. Replace the example links above with your actual website pages
+2. Add descriptions that help AI understand what each page contains
+3. Focus on your most valuable and informative content
+4. Remove this note section when you're done customizing`;
+      }
 
       setGeneratedContent(content);
       setIsGenerating(false);
@@ -72,7 +140,14 @@ const Generator = () => {
         title: "LLMS.txt Generated!",
         description: "Your LLMS.txt file has been generated successfully.",
       });
-    }, 2000);
+    } catch (error) {
+      setIsGenerating(false);
+      toast({
+        title: "Generation Failed",
+        description: "Could not generate LLMS.txt. Please check the URL and try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const copyToClipboard = () => {
