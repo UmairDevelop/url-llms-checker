@@ -42,8 +42,8 @@ const Generator = () => {
       // Deep crawl and content discovery
       const discoveredContent = await performDeepCrawl(baseUrl, domain);
       
-      // Generate intelligent site description
-      const siteAnalysis = analyzeSiteContent(discoveredContent.siteContent);
+      // Generate intelligent site description with enhanced analysis
+      const siteAnalysis = analyzeSiteContent(discoveredContent.siteContent, discoveredContent.pages);
       
       // Generate content based on discovered links
       let content = `# ${domain}
@@ -53,8 +53,14 @@ const Generator = () => {
 `;
 
       if (discoveredContent.pages.length > 0) {
+        // Update page descriptions with site type context
+        const updatedPages = discoveredContent.pages.map(page => ({
+          ...page,
+          description: generatePageDescription(page.title, '', page.url, siteAnalysis.siteType)
+        }));
+        
         // Group content by intelligent categorization
-        const contentGroups = categorizeContent(discoveredContent.pages, siteAnalysis.siteType);
+        const contentGroups = categorizeContent(updatedPages, siteAnalysis.siteType);
         
         // Add organized content groups
         Object.entries(contentGroups).forEach(([category, pages]) => {
@@ -146,7 +152,12 @@ Example format:
           let fullUrl = href;
           
           if (!href.startsWith('http')) {
-            fullUrl = href.startsWith('/') ? `${baseUrl}${href}` : `${baseUrl}/${href}`;
+            // Ensure no double slashes when constructing URLs
+            if (href.startsWith('/')) {
+              fullUrl = baseUrl + href;
+            } else {
+              fullUrl = `${baseUrl}/${href}`;
+            }
           }
           
           // Only include internal links and avoid duplicates
@@ -209,122 +220,255 @@ Example format:
     };
   };
   
-  // Intelligent site content analysis
-  const analyzeSiteContent = (content: string) => {
+  // Advanced site content analysis with deeper niche detection
+  const analyzeSiteContent = (content: string, pages: any[]) => {
     const contentLower = content.toLowerCase();
     
-    // Advanced content analysis patterns
+    // Enhanced pattern matching with weighted scoring
     const patterns = {
-      gaming: ['gaming', 'pc build', 'graphics card', 'cpu', 'motherboard', 'gaming rig', 'fps'],
-      tech: ['tech review', 'technology', 'gadget', 'device', 'smartphone', 'laptop', 'hardware'],
-      vacuum: ['vacuum', 'cleaning', 'carpet', 'floor', 'suction', 'filtration', 'pet hair'],
-      coffee: ['coffee', 'espresso', 'brewing', 'grinder', 'roast', 'barista', 'caffeine'],
-      health: ['health', 'fitness', 'wellness', 'nutrition', 'exercise', 'medical', 'doctor'],
-      finance: ['finance', 'money', 'investment', 'banking', 'loan', 'insurance', 'budget'],
-      food: ['recipe', 'cooking', 'kitchen', 'ingredient', 'meal', 'chef', 'restaurant'],
-      travel: ['travel', 'vacation', 'hotel', 'flight', 'destination', 'tourism', 'trip'],
-      education: ['education', 'learn', 'course', 'tutorial', 'training', 'skill', 'study'],
-      business: ['business', 'marketing', 'entrepreneur', 'startup', 'company', 'corporate']
+      gaming: {
+        keywords: ['gaming', 'pc build', 'graphics card', 'cpu', 'motherboard', 'gaming rig', 'fps', 'rtx', 'amd', 'intel', 'benchmark'],
+        weight: 2,
+        indicators: ['pc', 'build', 'review', 'best gaming']
+      },
+      coffee: {
+        keywords: ['coffee', 'espresso', 'brewing', 'grinder', 'roast', 'barista', 'caffeine', 'beans', 'cappuccino'],
+        weight: 2,
+        indicators: ['coffee maker', 'espresso machine', 'brewing guide']
+      },
+      vacuum: {
+        keywords: ['vacuum', 'cleaning', 'carpet', 'floor', 'suction', 'filtration', 'pet hair', 'dyson', 'shark'],
+        weight: 2,
+        indicators: ['vacuum cleaner', 'cleaning guide', 'best vacuum']
+      },
+      tech: {
+        keywords: ['tech', 'technology', 'gadget', 'device', 'smartphone', 'laptop', 'hardware', 'software'],
+        weight: 1.5,
+        indicators: ['tech review', 'device review', 'gadget']
+      },
+      health: {
+        keywords: ['health', 'fitness', 'wellness', 'nutrition', 'exercise', 'medical', 'diet'],
+        weight: 1.5,
+        indicators: ['health guide', 'fitness tips', 'wellness']
+      },
+      finance: {
+        keywords: ['finance', 'money', 'investment', 'banking', 'loan', 'insurance', 'budget'],
+        weight: 1.5,
+        indicators: ['financial advice', 'investment guide', 'money management']
+      }
     };
     
-    let siteType = 'general';
-    let maxMatches = 0;
+    let bestMatch = { type: 'general', score: 0, confidence: 0 };
     
-    for (const [type, keywords] of Object.entries(patterns)) {
-      const matches = keywords.filter(keyword => contentLower.includes(keyword)).length;
-      if (matches > maxMatches) {
-        maxMatches = matches;
-        siteType = type;
+    // Analyze content with weighted scoring
+    for (const [type, config] of Object.entries(patterns)) {
+      let score = 0;
+      
+      // Count keyword matches
+      const keywordMatches = config.keywords.filter(keyword => contentLower.includes(keyword)).length;
+      score += keywordMatches * config.weight;
+      
+      // Boost score for strong indicators
+      const indicatorMatches = config.indicators.filter(indicator => contentLower.includes(indicator)).length;
+      score += indicatorMatches * 3;
+      
+      // Analyze page titles for context
+      const pageTitleMatches = pages.filter(page => 
+        config.keywords.some(keyword => page.title.toLowerCase().includes(keyword))
+      ).length;
+      score += pageTitleMatches * 2;
+      
+      const confidence = Math.min(score / (config.keywords.length + config.indicators.length), 1);
+      
+      if (score > bestMatch.score) {
+        bestMatch = { type, score, confidence };
       }
     }
     
-    // Generate intelligent descriptions
-    const descriptions = {
-      gaming: 'Expert gaming PC reviews, hardware recommendations, and performance guides for gamers and enthusiasts',
-      tech: 'Technology reviews, product comparisons, and expert insights on the latest gadgets and devices',
-      vacuum: 'Comprehensive vacuum cleaner reviews, cleaning guides, and expert recommendations for home maintenance',
-      coffee: 'Coffee equipment reviews, brewing guides, and expert recommendations for coffee enthusiasts',
-      health: 'Health and wellness information, fitness guides, and expert advice for better living',
-      finance: 'Financial advice, investment guides, and money management resources for personal finance',
-      food: 'Recipes, cooking guides, and culinary expertise for food lovers and home chefs',
-      travel: 'Travel guides, destination reviews, and expert tips for travelers and adventurers',
-      education: 'Educational resources, learning guides, and skill development content for students and professionals',
-      business: 'Business insights, entrepreneurship guides, and professional development resources',
-      general: 'Valuable content and expert insights across various topics and interests'
+    // Generate contextual descriptions based on analysis
+    const generateDescription = (type: string, pages: any[]) => {
+      const sampleTitles = pages.slice(0, 3).map(p => p.title.toLowerCase()).join(' ');
+      
+      switch (type) {
+        case 'gaming':
+          if (sampleTitles.includes('pc') || sampleTitles.includes('build')) {
+            return 'Expert gaming PC reviews, build guides, and hardware recommendations for gamers and PC enthusiasts';
+          }
+          return 'Gaming reviews, performance analysis, and expert recommendations for gaming enthusiasts';
+          
+        case 'coffee':
+          if (sampleTitles.includes('machine') || sampleTitles.includes('maker')) {
+            return 'Coffee equipment reviews, brewing guides, and expert recommendations for coffee enthusiasts and baristas';
+          }
+          return 'Coffee brewing techniques, equipment analysis, and expert insights for coffee lovers';
+          
+        case 'vacuum':
+          return 'Comprehensive vacuum cleaner reviews, cleaning performance tests, and expert buying guides for home maintenance';
+          
+        case 'tech':
+          return 'Technology product reviews, device comparisons, and expert insights on the latest gadgets and innovations';
+          
+        case 'health':
+          return 'Health and wellness guides, fitness advice, and expert recommendations for better living';
+          
+        case 'finance':
+          return 'Financial planning advice, investment strategies, and money management resources for personal finance';
+          
+        default:
+          // Try to detect from page content
+          if (sampleTitles.includes('review') || sampleTitles.includes('best')) {
+            return 'Expert product reviews, buying guides, and recommendations across various categories';
+          }
+          return 'Valuable content and expert insights for informed decision-making';
+      }
     };
     
     return {
-      siteType,
-      description: descriptions[siteType as keyof typeof descriptions]
+      siteType: bestMatch.type,
+      confidence: bestMatch.confidence,
+      description: generateDescription(bestMatch.type, pages)
     };
   };
   
-  // Intelligent content categorization
+  // Smart content categorization with niche-specific categories
   const categorizeContent = (pages: any[], siteType: string) => {
     const categories: { [key: string]: any[] } = {};
     
+    // Define niche-specific category mappings
+    const nicheCategories = {
+      gaming: {
+        'PC Builds & Components': ['build', 'component', 'cpu', 'gpu', 'motherboard', 'ram', 'ssd'],
+        'Gaming Reviews': ['review', 'game', 'gaming'],
+        'Hardware Guides': ['guide', 'how to', 'setup', 'install'],
+        'Product Recommendations': ['best', 'top', 'recommend']
+      },
+      coffee: {
+        'Coffee Equipment Reviews': ['review', 'machine', 'maker', 'grinder'],
+        'Brewing Guides': ['guide', 'how to', 'brew', 'method'],
+        'Product Recommendations': ['best', 'top', 'recommend'],
+        'Coffee Knowledge': ['beans', 'roast', 'origin', 'flavor']
+      },
+      vacuum: {
+        'Vacuum Reviews': ['review', 'vacuum', 'cleaner'],
+        'Cleaning Guides': ['guide', 'how to', 'clean', 'maintain'],
+        'Product Comparisons': ['vs', 'comparison', 'compare'],
+        'Buying Guides': ['best', 'top', 'buying guide']
+      },
+      tech: {
+        'Product Reviews': ['review', 'device', 'gadget'],
+        'Tech Guides': ['guide', 'how to', 'setup'],
+        'Comparisons & Analysis': ['vs', 'comparison', 'analysis'],
+        'Recommendations': ['best', 'top', 'recommend']
+      }
+    };
+    
+    const categoryMap = nicheCategories[siteType as keyof typeof nicheCategories] || {
+      'Reviews & Analysis': ['review', 'analysis'],
+      'Guides & Tutorials': ['guide', 'how to', 'tutorial'],
+      'Recommendations': ['best', 'top', 'recommend'],
+      'Product Information': ['product', 'spec', 'feature']
+    };
+    
     pages.forEach(page => {
-      let category = page.category || 'Main Content';
-      
-      // Intelligent recategorization based on content
       const urlLower = page.url.toLowerCase();
       const titleLower = page.title.toLowerCase();
+      let assignedCategory = 'Featured Content';
       
-      if (urlLower.includes('review') || titleLower.includes('review')) {
-        category = 'Reviews & Analysis';
-      } else if (urlLower.includes('guide') || titleLower.includes('guide') || titleLower.includes('how')) {
-        category = 'Guides & Tutorials';
-      } else if (urlLower.includes('best') || titleLower.includes('best') || titleLower.includes('top')) {
-        category = 'Recommendations';
-      } else if (urlLower.includes('blog') || urlLower.includes('article') || urlLower.includes('news')) {
-        category = 'Articles & News';
-      } else if (urlLower.includes('product') || urlLower.includes('catalog')) {
-        category = 'Products & Services';
-      } else if (urlLower.includes('about') || urlLower.includes('contact') || urlLower.includes('support')) {
-        category = 'About & Support';
+      // Skip generic pages
+      if (urlLower.includes('about') || urlLower.includes('contact') || 
+          urlLower.includes('privacy') || urlLower.includes('terms')) {
+        return;
       }
       
-      if (!categories[category]) {
-        categories[category] = [];
+      // Find best matching category
+      for (const [categoryName, keywords] of Object.entries(categoryMap)) {
+        if (keywords.some(keyword => titleLower.includes(keyword) || urlLower.includes(keyword))) {
+          assignedCategory = categoryName;
+          break;
+        }
       }
-      categories[category].push(page);
+      
+      if (!categories[assignedCategory]) {
+        categories[assignedCategory] = [];
+      }
+      categories[assignedCategory].push(page);
     });
     
-    // Sort categories by importance
-    const categoryOrder = ['Reviews & Analysis', 'Guides & Tutorials', 'Recommendations', 'Products & Services', 'Articles & News', 'Main Content', 'About & Support'];
+    // Sort categories by relevance and limit items
     const sortedCategories: { [key: string]: any[] } = {};
+    const categoryOrder = Object.keys(categoryMap).concat(['Featured Content']);
     
     categoryOrder.forEach(cat => {
-      if (categories[cat]) {
-        sortedCategories[cat] = categories[cat].slice(0, 8); // Limit per category
+      if (categories[cat] && categories[cat].length > 0) {
+        // Sort by priority and limit to 6 items per category
+        sortedCategories[cat] = categories[cat]
+          .sort((a, b) => b.priority - a.priority)
+          .slice(0, 6);
       }
     });
     
     return sortedCategories;
   };
   
-  // Generate intelligent page descriptions
-  const generatePageDescription = (title: string, content: string, url: string) => {
+  // Generate unique, contextual page descriptions
+  const generatePageDescription = (title: string, content: string, url: string, siteType?: string) => {
     const titleLower = title.toLowerCase();
     const contentLower = content.toLowerCase();
     const urlLower = url.toLowerCase();
     
-    // Pattern matching for description generation
+    // Extract specific details for unique descriptions
+    const extractSpecificDetails = () => {
+      // Look for price mentions
+      const priceMatch = content.match(/\$[\d,]+|\d+\s*dollars?|\d+k|budget|cheap|expensive/i);
+      const priceInfo = priceMatch ? ` with pricing insights` : '';
+      
+      // Look for brand names
+      const brandMatch = content.match(/\b(nvidia|amd|intel|corsair|asus|msi|gigabyte|evga|razer|logitech|samsung|lg|dell|hp|lenovo|apple|sony|bose|sennheiser|steelseries|hyperx|cooler master|nzxt|thermaltake|fractal design|be quiet|seasonic|evga|antec|phanteks|lian li|deepcool|arctic|noctua|dyson|shark|bissell|hoover|eureka|black\+decker|tineco|roborock|irobot|breville|cuisinart|hamilton beach|keurig|nespresso|delonghi|ninja|vitamix|kitchenaid|oster|mr\.?\s*coffee|bodum|chemex|hario|v60|aeropress|french press)\b/gi);
+      const brandInfo = brandMatch ? ` featuring ${brandMatch.slice(0, 2).join(' and ')} products` : '';
+      
+      // Look for specific features or specs
+      const specMatch = content.match(/\b(4k|1080p|1440p|144hz|165hz|240hz|rtx|gtx|ryzen|core i[3579]|ddr[45]|ssd|nvme|wifi|bluetooth|rgb|mechanical|wireless|gaming|professional|budget|premium|flagship|entry-level)\b/gi);
+      const specInfo = specMatch ? ` covering ${specMatch.slice(0, 3).join(', ')} specifications` : '';
+      
+      return { priceInfo, brandInfo, specInfo };
+    };
+    
+    const details = extractSpecificDetails();
+    
+    // Generate context-aware descriptions
     if (titleLower.includes('review') || contentLower.includes('review')) {
-      return `Detailed review and analysis with expert insights and recommendations`;
-    } else if (titleLower.includes('guide') || titleLower.includes('how')) {
-      return `Comprehensive guide with step-by-step instructions and expert tips`;
-    } else if (titleLower.includes('best') || titleLower.includes('top')) {
-      return `Curated recommendations and expert picks for top products and solutions`;
-    } else if (titleLower.includes('comparison') || contentLower.includes('vs')) {
-      return `In-depth comparison analysis to help you make informed decisions`;
-    } else if (urlLower.includes('blog') || urlLower.includes('article')) {
-      return `Informative article with expert insights and valuable information`;
-    } else if (titleLower.includes('tips') || contentLower.includes('tip')) {
-      return `Expert tips and practical advice from industry professionals`;
-    } else {
-      return `Valuable content with expert information and practical insights`;
+      if (titleLower.includes('best') || titleLower.includes('top')) {
+        return `Comprehensive review roundup comparing top products${details.brandInfo}${details.priceInfo} with performance analysis and recommendations`;
+      }
+      return `In-depth product review with hands-on testing${details.specInfo}${details.brandInfo} and expert analysis`;
+    } 
+    
+    if (titleLower.includes('guide') || titleLower.includes('how to')) {
+      return `Step-by-step guide with expert recommendations${details.priceInfo}${details.specInfo} and practical tips`;
+    } 
+    
+    if (titleLower.includes('best') || titleLower.includes('top')) {
+      return `Curated selection of top-rated products${details.brandInfo}${details.priceInfo} with expert analysis and buying recommendations`;
+    } 
+    
+    if (titleLower.includes('comparison') || titleLower.includes('vs')) {
+      return `Detailed comparison analysis${details.brandInfo}${details.specInfo} to help you choose the right product`;
+    } 
+    
+    if (titleLower.includes('buying guide') || titleLower.includes('buyer')) {
+      return `Comprehensive buying guide with expert insights${details.priceInfo}${details.specInfo} and product recommendations`;
     }
+    
+    if (urlLower.includes('blog') || urlLower.includes('article')) {
+      return `Expert insights and analysis${details.specInfo}${details.brandInfo} with practical information and recommendations`;
+    } 
+    
+    if (titleLower.includes('tips') || contentLower.includes('tip')) {
+      return `Professional tips and expert advice${details.specInfo} from industry specialists`;
+    }
+    
+    // Fallback with some context
+    return `Expert analysis and recommendations${details.brandInfo}${details.priceInfo} with valuable insights for informed decisions`;
   };
   
   // Analyze page importance for prioritization
