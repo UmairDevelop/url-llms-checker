@@ -38,219 +38,60 @@ const Generator = () => {
       const normalizedUrl = websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`;
       const baseUrl = normalizedUrl.endsWith('/') ? normalizedUrl.slice(0, -1) : normalizedUrl;
       const domain = new URL(baseUrl).hostname;
-      const siteName = domain.replace('www.', '').split('.')[0];
-      const capitalizedSiteName = siteName.charAt(0).toUpperCase() + siteName.slice(1);
       
-      // Try to fetch the website to discover actual content
-      let discoveredLinks: { title: string; url: string; description: string }[] = [];
-      let siteDescription = '';
-      let sitePurpose = '';
+      // Deep crawl and content discovery
+      const discoveredContent = await performDeepCrawl(baseUrl, domain);
       
-      try {
-        const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(baseUrl)}`);
-        if (response.ok) {
-          const html = await response.text();
-          
-          // Extract navigation links and analyze content
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          
-          // Analyze site content to understand its purpose
-          const title = doc.querySelector('title')?.textContent || '';
-          const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
-          const h1Elements = Array.from(doc.querySelectorAll('h1')).map(h => h.textContent?.trim()).filter(Boolean);
-          const h2Elements = Array.from(doc.querySelectorAll('h2')).map(h => h.textContent?.trim()).filter(Boolean);
-          
-          // Determine site type and purpose
-          const content = (title + ' ' + metaDesc + ' ' + h1Elements.join(' ') + ' ' + h2Elements.join(' ')).toLowerCase();
-          
-          if (content.includes('gaming') || content.includes('pc') || content.includes('computer') || content.includes('tech review')) {
-            sitePurpose = 'gaming and tech reviews';
-            siteDescription = 'Expert gaming PC reviews, hardware guides, and tech product recommendations';
-          } else if (content.includes('coffee') || content.includes('espresso') || content.includes('maker')) {
-            sitePurpose = 'coffee equipment reviews';
-            siteDescription = 'Coffee equipment reviews, brewing guides, and product recommendations';
-          } else if (content.includes('vacuum') || content.includes('cleaning')) {
-            sitePurpose = 'vacuum and cleaning advice';
-            siteDescription = 'Vacuum cleaner reviews, cleaning guides, and home maintenance advice';
-          } else if (content.includes('review') || content.includes('guide') || content.includes('best')) {
-            sitePurpose = 'product reviews and guides';
-            siteDescription = 'Product reviews, buying guides, and recommendations';
-          } else if (content.includes('blog') || content.includes('article') || content.includes('news')) {
-            sitePurpose = 'content and articles';
-            siteDescription = 'Articles, insights, and valuable content';
-          } else if (content.includes('service') || content.includes('business')) {
-            sitePurpose = 'services and solutions';
-            siteDescription = 'Professional services and business solutions';
-          } else {
-            sitePurpose = 'information and resources';
-            siteDescription = 'Valuable information and resources';
-          }
-          
-          const links = Array.from(doc.querySelectorAll('a[href]'));
-          const foundPages: { title: string; url: string; description: string }[] = [];
-          
-          // Look for valuable content pages
-          const contentKeywords = {
-            'review': 'detailed reviews and analysis',
-            'guide': 'comprehensive guides and tutorials', 
-            'best': 'top recommendations and comparisons',
-            'how': 'step-by-step instructions and tips',
-            'buying': 'buying advice and product selection',
-            'comparison': 'product comparisons and analysis',
-            'test': 'testing results and performance data',
-            'blog': 'latest articles and insights',
-            'news': 'latest news and updates',
-            'tutorial': 'educational tutorials and how-tos',
-            'tips': 'expert tips and advice',
-            'about': 'information about the site and team',
-            'contact': 'contact information and support'
-          };
-          
-          // Prioritize content-rich pages
-          links.forEach(link => {
-            const href = link.getAttribute('href');
-            const text = link.textContent?.trim() || '';
-            
-            if (href && text && href.length > 1 && !href.includes('#') && !href.includes('mailto:')) {
-              let fullUrl = href;
-              
-              if (!href.startsWith('http')) {
-                if (href.startsWith('/')) {
-                  fullUrl = `${baseUrl}${href}`;
-                } else {
-                  fullUrl = `${baseUrl}/${href}`;
-                }
-              }
-              
-              // Skip external links unless they're subdomains
-              if (fullUrl.startsWith('http') && !fullUrl.includes(domain)) {
-                return;
-              }
-              
-              const urlLower = href.toLowerCase();
-              const textLower = text.toLowerCase();
-              
-              // Find matching keywords and create meaningful descriptions
-              let description = text;
-              let priority = 0;
-              
-              for (const [keyword, desc] of Object.entries(contentKeywords)) {
-                if (urlLower.includes(keyword) || textLower.includes(keyword)) {
-                  description = desc;
-                  priority = keyword === 'review' || keyword === 'guide' || keyword === 'best' ? 3 : 
-                            keyword === 'blog' || keyword === 'tutorial' || keyword === 'tips' ? 2 : 1;
-                  break;
-                }
-              }
-              
-              // Special handling for numbered lists or "best of" content
-              if (textLower.includes('best') || textLower.match(/\d+\s*(best|top)/)) {
-                description = 'curated recommendations and top picks';
-                priority = 3;
-              }
-              
-              foundPages.push({
-                title: text,
-                url: fullUrl,
-                description,
-                priority
-              } as any);
-            }
-          });
-          
-          // Sort by priority and remove duplicates
-          const uniquePages = foundPages
-            .filter((page, index, arr) => 
-              arr.findIndex(p => p.url.toLowerCase() === page.url.toLowerCase()) === index
-            )
-            .sort((a: any, b: any) => (b.priority || 0) - (a.priority || 0))
-            .slice(0, 12);
-          
-          discoveredLinks = uniquePages.map(({ title, url, description }) => ({ title, url, description }));
-        }
-      } catch (fetchError) {
-        console.warn('Could not fetch website content for analysis:', fetchError);
-        // Fallback values
-        siteDescription = 'Valuable content and resources for users';
-        sitePurpose = 'information and resources';
-      }
+      // Generate intelligent site description
+      const siteAnalysis = analyzeSiteContent(discoveredContent.siteContent);
       
-      // Generate content based on discovered links or fallback to basic structure
+      // Generate content based on discovered links
       let content = `# ${domain}
 
-> ${siteDescription}
+> ${siteAnalysis.description}
 
 `;
 
-      if (discoveredLinks.length > 0) {
-        // Group content by type
-        const contentGroups: { [key: string]: typeof discoveredLinks } = {};
-        
-        discoveredLinks.forEach(link => {
-          const desc = link.description.toLowerCase();
-          let category = 'Main Content';
-          
-          if (desc.includes('review') || desc.includes('analysis') || desc.includes('comparison')) {
-            category = 'Reviews & Analysis';
-          } else if (desc.includes('guide') || desc.includes('tutorial') || desc.includes('how-to')) {
-            category = 'Guides & Tutorials';
-          } else if (desc.includes('recommendation') || desc.includes('best') || desc.includes('top')) {
-            category = 'Recommendations';
-          } else if (desc.includes('news') || desc.includes('article') || desc.includes('blog')) {
-            category = 'Articles & News';
-          } else if (desc.includes('about') || desc.includes('contact') || desc.includes('support')) {
-            category = 'About & Support';
-          }
-          
-          if (!contentGroups[category]) {
-            contentGroups[category] = [];
-          }
-          contentGroups[category].push(link);
-        });
-        
-        // Add home page first
-        content += `## Main Content\n- [Home Page](${baseUrl}): Main ${sitePurpose} hub and site overview\n\n`;
+      if (discoveredContent.pages.length > 0) {
+        // Group content by intelligent categorization
+        const contentGroups = categorizeContent(discoveredContent.pages, siteAnalysis.siteType);
         
         // Add organized content groups
-        Object.entries(contentGroups).forEach(([category, links]) => {
-          if (category !== 'Main Content') {
+        Object.entries(contentGroups).forEach(([category, pages]) => {
+          if (pages.length > 0) {
             content += `## ${category}\n`;
-            links.forEach(link => {
-              content += `- [${link.title}](${link.url}): ${link.description}\n`;
+            pages.forEach(page => {
+              content += `- [${page.title}](${page.url}): ${page.description}\n`;
             });
             content += '\n';
           }
         });
-        
-        // Add any ungrouped main content
-        if (contentGroups['Main Content']) {
-          contentGroups['Main Content'].forEach(link => {
-            content += `- [${link.title}](${link.url}): ${link.description}\n`;
-          });
-        }
       } else {
+        // Fallback content with customization instructions
         content += `## Main Content
-- [Home Page](${baseUrl}): Main landing page and ${sitePurpose} overview
+- [Home Page](${baseUrl}): Main landing page and site overview
 
 ## Important Note
-⚠️ **Please customize this template!**
+⚠️ **Content Discovery Limited**
 
-The following are example links. Replace them with your actual website pages and content:
+We couldn't automatically discover your site's content structure. This may be due to:
+- Site protection mechanisms
+- JavaScript-heavy content loading
+- Complex navigation structure
 
-- [About Us](${baseUrl}/about): Information about your mission and team
-- [Contact](${baseUrl}/contact): How to get in touch with you
+Please customize this template with your actual valuable content:
 
-## Additional Pages
-Add links to your most important content here:
-- [Your Important Page 1](${baseUrl}/page1): Description of the content
-- [Your Important Page 2](${baseUrl}/page2): Description of the content
+## Your Content Categories
+Add your most important pages here with descriptive summaries that help AI understand their value.
+
+Example format:
+- [Your Page Title](${baseUrl}/page-url): Detailed description of what this page offers to users
 
 ## Instructions
-1. Replace the example links above with your actual website pages
-2. Add descriptions that help AI understand what each page contains
-3. Focus on your most valuable and informative content
-4. Remove this note section when you're done customizing`;
+1. Replace the example content above with your actual website pages
+2. Focus on content that provides real value to visitors
+3. Use descriptive summaries that explain the page's purpose and content
+4. Remove this instruction section when complete`;
       }
 
       setGeneratedContent(content);
@@ -268,6 +109,257 @@ Add links to your most important content here:
         variant: "destructive",
       });
     }
+  };
+
+  // Deep crawling function
+  const performDeepCrawl = async (baseUrl: string, domain: string) => {
+    const discoveredPages: { title: string; url: string; description: string; priority: number; category: string }[] = [];
+    let siteContent = '';
+    
+    try {
+      // First, crawl the homepage
+      const homepageResponse = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(baseUrl)}`);
+      if (!homepageResponse.ok) throw new Error('Failed to fetch homepage');
+      
+      const homepageHtml = await homepageResponse.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(homepageHtml, 'text/html');
+      
+      // Extract comprehensive site content for analysis
+      const title = doc.querySelector('title')?.textContent || '';
+      const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+      const headings = Array.from(doc.querySelectorAll('h1, h2, h3')).map(h => h.textContent?.trim()).filter(Boolean);
+      const bodyText = doc.querySelector('body')?.textContent?.slice(0, 2000) || '';
+      
+      siteContent = [title, metaDesc, ...headings, bodyText].join(' ');
+      
+      // Find all internal links for deeper crawling
+      const links = Array.from(doc.querySelectorAll('a[href]'));
+      const internalLinks = new Set<string>();
+      
+      // Collect internal links
+      links.forEach(link => {
+        const href = link.getAttribute('href');
+        const text = link.textContent?.trim() || '';
+        
+        if (href && text && href.length > 1 && !href.includes('#') && !href.includes('mailto:')) {
+          let fullUrl = href;
+          
+          if (!href.startsWith('http')) {
+            fullUrl = href.startsWith('/') ? `${baseUrl}${href}` : `${baseUrl}/${href}`;
+          }
+          
+          // Only include internal links and avoid duplicates
+          if (fullUrl.includes(domain) && fullUrl !== baseUrl && !isGenericPage(href)) {
+            internalLinks.add(fullUrl);
+          }
+        }
+      });
+      
+      // Crawl discovered internal pages (limit to prevent overload)
+      const pagesToCrawl = Array.from(internalLinks).slice(0, 15);
+      const crawlPromises = pagesToCrawl.map(async (pageUrl) => {
+        try {
+          const pageResponse = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(pageUrl)}`);
+          if (pageResponse.ok) {
+            const pageHtml = await pageResponse.text();
+            const pageDoc = parser.parseFromString(pageHtml, 'text/html');
+            
+            const pageTitle = pageDoc.querySelector('title')?.textContent?.trim() || 
+                            pageDoc.querySelector('h1')?.textContent?.trim() || 
+                            pageUrl.split('/').pop() || 'Unknown Page';
+            
+            const pageContent = pageDoc.querySelector('body')?.textContent?.slice(0, 1000) || '';
+            const pageDescription = generatePageDescription(pageTitle, pageContent, pageUrl);
+            const { priority, category } = analyzePageImportance(pageTitle, pageContent, pageUrl);
+            
+            return {
+              title: pageTitle,
+              url: pageUrl,
+              description: pageDescription,
+              priority,
+              category
+            };
+          }
+        } catch (error) {
+          console.warn(`Failed to crawl ${pageUrl}:`, error);
+        }
+        return null;
+      });
+      
+      const crawledPages = (await Promise.all(crawlPromises)).filter(Boolean) as typeof discoveredPages;
+      discoveredPages.push(...crawledPages);
+      
+      // Add homepage
+      discoveredPages.unshift({
+        title: 'Home Page',
+        url: baseUrl,
+        description: 'Main landing page with site overview and navigation to key content areas',
+        priority: 2,
+        category: 'Main Content'
+      });
+      
+    } catch (error) {
+      console.warn('Deep crawl failed:', error);
+    }
+    
+    return {
+      pages: discoveredPages.sort((a, b) => b.priority - a.priority),
+      siteContent
+    };
+  };
+  
+  // Intelligent site content analysis
+  const analyzeSiteContent = (content: string) => {
+    const contentLower = content.toLowerCase();
+    
+    // Advanced content analysis patterns
+    const patterns = {
+      gaming: ['gaming', 'pc build', 'graphics card', 'cpu', 'motherboard', 'gaming rig', 'fps'],
+      tech: ['tech review', 'technology', 'gadget', 'device', 'smartphone', 'laptop', 'hardware'],
+      vacuum: ['vacuum', 'cleaning', 'carpet', 'floor', 'suction', 'filtration', 'pet hair'],
+      coffee: ['coffee', 'espresso', 'brewing', 'grinder', 'roast', 'barista', 'caffeine'],
+      health: ['health', 'fitness', 'wellness', 'nutrition', 'exercise', 'medical', 'doctor'],
+      finance: ['finance', 'money', 'investment', 'banking', 'loan', 'insurance', 'budget'],
+      food: ['recipe', 'cooking', 'kitchen', 'ingredient', 'meal', 'chef', 'restaurant'],
+      travel: ['travel', 'vacation', 'hotel', 'flight', 'destination', 'tourism', 'trip'],
+      education: ['education', 'learn', 'course', 'tutorial', 'training', 'skill', 'study'],
+      business: ['business', 'marketing', 'entrepreneur', 'startup', 'company', 'corporate']
+    };
+    
+    let siteType = 'general';
+    let maxMatches = 0;
+    
+    for (const [type, keywords] of Object.entries(patterns)) {
+      const matches = keywords.filter(keyword => contentLower.includes(keyword)).length;
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        siteType = type;
+      }
+    }
+    
+    // Generate intelligent descriptions
+    const descriptions = {
+      gaming: 'Expert gaming PC reviews, hardware recommendations, and performance guides for gamers and enthusiasts',
+      tech: 'Technology reviews, product comparisons, and expert insights on the latest gadgets and devices',
+      vacuum: 'Comprehensive vacuum cleaner reviews, cleaning guides, and expert recommendations for home maintenance',
+      coffee: 'Coffee equipment reviews, brewing guides, and expert recommendations for coffee enthusiasts',
+      health: 'Health and wellness information, fitness guides, and expert advice for better living',
+      finance: 'Financial advice, investment guides, and money management resources for personal finance',
+      food: 'Recipes, cooking guides, and culinary expertise for food lovers and home chefs',
+      travel: 'Travel guides, destination reviews, and expert tips for travelers and adventurers',
+      education: 'Educational resources, learning guides, and skill development content for students and professionals',
+      business: 'Business insights, entrepreneurship guides, and professional development resources',
+      general: 'Valuable content and expert insights across various topics and interests'
+    };
+    
+    return {
+      siteType,
+      description: descriptions[siteType as keyof typeof descriptions]
+    };
+  };
+  
+  // Intelligent content categorization
+  const categorizeContent = (pages: any[], siteType: string) => {
+    const categories: { [key: string]: any[] } = {};
+    
+    pages.forEach(page => {
+      let category = page.category || 'Main Content';
+      
+      // Intelligent recategorization based on content
+      const urlLower = page.url.toLowerCase();
+      const titleLower = page.title.toLowerCase();
+      
+      if (urlLower.includes('review') || titleLower.includes('review')) {
+        category = 'Reviews & Analysis';
+      } else if (urlLower.includes('guide') || titleLower.includes('guide') || titleLower.includes('how')) {
+        category = 'Guides & Tutorials';
+      } else if (urlLower.includes('best') || titleLower.includes('best') || titleLower.includes('top')) {
+        category = 'Recommendations';
+      } else if (urlLower.includes('blog') || urlLower.includes('article') || urlLower.includes('news')) {
+        category = 'Articles & News';
+      } else if (urlLower.includes('product') || urlLower.includes('catalog')) {
+        category = 'Products & Services';
+      } else if (urlLower.includes('about') || urlLower.includes('contact') || urlLower.includes('support')) {
+        category = 'About & Support';
+      }
+      
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push(page);
+    });
+    
+    // Sort categories by importance
+    const categoryOrder = ['Reviews & Analysis', 'Guides & Tutorials', 'Recommendations', 'Products & Services', 'Articles & News', 'Main Content', 'About & Support'];
+    const sortedCategories: { [key: string]: any[] } = {};
+    
+    categoryOrder.forEach(cat => {
+      if (categories[cat]) {
+        sortedCategories[cat] = categories[cat].slice(0, 8); // Limit per category
+      }
+    });
+    
+    return sortedCategories;
+  };
+  
+  // Generate intelligent page descriptions
+  const generatePageDescription = (title: string, content: string, url: string) => {
+    const titleLower = title.toLowerCase();
+    const contentLower = content.toLowerCase();
+    const urlLower = url.toLowerCase();
+    
+    // Pattern matching for description generation
+    if (titleLower.includes('review') || contentLower.includes('review')) {
+      return `Detailed review and analysis with expert insights and recommendations`;
+    } else if (titleLower.includes('guide') || titleLower.includes('how')) {
+      return `Comprehensive guide with step-by-step instructions and expert tips`;
+    } else if (titleLower.includes('best') || titleLower.includes('top')) {
+      return `Curated recommendations and expert picks for top products and solutions`;
+    } else if (titleLower.includes('comparison') || contentLower.includes('vs')) {
+      return `In-depth comparison analysis to help you make informed decisions`;
+    } else if (urlLower.includes('blog') || urlLower.includes('article')) {
+      return `Informative article with expert insights and valuable information`;
+    } else if (titleLower.includes('tips') || contentLower.includes('tip')) {
+      return `Expert tips and practical advice from industry professionals`;
+    } else {
+      return `Valuable content with expert information and practical insights`;
+    }
+  };
+  
+  // Analyze page importance for prioritization
+  const analyzePageImportance = (title: string, content: string, url: string) => {
+    let priority = 1;
+    let category = 'Main Content';
+    
+    const titleLower = title.toLowerCase();
+    const urlLower = url.toLowerCase();
+    
+    // High priority content
+    if (titleLower.includes('review') || urlLower.includes('review')) {
+      priority = 5;
+      category = 'Reviews';
+    } else if (titleLower.includes('guide') || titleLower.includes('how')) {
+      priority = 4;
+      category = 'Guides';
+    } else if (titleLower.includes('best') || titleLower.includes('top')) {
+      priority = 4;
+      category = 'Recommendations';
+    } else if (urlLower.includes('blog') || urlLower.includes('article')) {
+      priority = 3;
+      category = 'Articles';
+    } else if (titleLower.includes('about') || titleLower.includes('contact')) {
+      priority = 1;
+      category = 'About';
+    }
+    
+    return { priority, category };
+  };
+  
+  // Filter out generic/administrative pages
+  const isGenericPage = (href: string) => {
+    const genericPages = ['privacy', 'terms', 'cookie', 'sitemap', 'robots.txt', 'admin', 'login', 'register', 'cart', 'checkout'];
+    return genericPages.some(generic => href.toLowerCase().includes(generic));
   };
 
   const copyToClipboard = () => {
