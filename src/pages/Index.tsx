@@ -18,6 +18,9 @@ const Index = () => {
       <Header />
       <main>
         <Hero />
+        <p className="text-center text-sm text-muted-foreground px-4">
+          Your donation helps cover our monthly Deep Crawler subscription and server costs to keep this tool fast and free.
+        </p>
         <SupportButtons />
         <InfoSection />
       </main>

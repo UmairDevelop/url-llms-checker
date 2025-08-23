@@ -1021,6 +1021,45 @@ This comprehensive version includes all discovered high-quality content from the
             </Card>
           </div>
 
+          <SupportButtons />
+
+          <Card className="animate-slide-up">
+            <CardHeader>
+              <CardTitle>How to Use Your Enhanced LLMS.txt Files</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                    1
+                  </div>
+                  <h3 className="font-semibold">Choose Format</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Use <strong>llms.txt</strong> for optimized AI training or <strong>llms-full.txt</strong> for comprehensive content discovery
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                    2
+                  </div>
+                  <h3 className="font-semibold">Deploy</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Upload the file to your website's root directory (same level as robots.txt)
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                    3
+                  </div>
+                  <h3 className="font-semibold">Verify</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Test accessibility at yoursite.com/llms.txt and monitor AI crawler access patterns
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card className="animate-slide-up">
             <CardHeader>
               <CardTitle>Enhanced Features</CardTitle>
@@ -1071,46 +1110,8 @@ This comprehensive version includes all discovered high-quality content from the
               </div>
             </CardContent>
           </Card>
-
-          <Card className="animate-slide-up">
-            <CardHeader>
-              <CardTitle>How to Use Your Enhanced LLMS.txt Files</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                    1
-                  </div>
-                  <h3 className="font-semibold">Choose Format</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Use <strong>llms.txt</strong> for optimized AI training or <strong>llms-full.txt</strong> for comprehensive content discovery
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                    2
-                  </div>
-                  <h3 className="font-semibold">Deploy</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Upload the file to your website's root directory (same level as robots.txt)
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                    3
-                  </div>
-                  <h3 className="font-semibold">Verify</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Test accessibility at yoursite.com/llms.txt and monitor AI crawler access patterns
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
         
-        <SupportButtons />
       </main>
       <Footer />
     </div>

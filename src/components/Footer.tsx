@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Twitter, Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -8,27 +9,52 @@ export const Footer = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-hero-gradient flex items-center justify-center">
-                <span className="text-white font-bold text-xs">L</span>
-              </div>
-              <span className="font-semibold">LLMS.txt Validator</span>
+              <Link to="/" className="flex items-center">
+                <img
+                  src="/uploads/ezllmstxt-logo.webp"
+                  alt="ezllmstxt.com logo"
+                  className="h-6 w-auto"
+                />
+              </Link>
             </div>
             <p className="text-sm text-muted-foreground">
-              A free tool to check if websites have implemented LLMS.txt for AI training data policies.
+              ezllmstxt.com – Free online tool to generate and validate LLMs.txt files for AI crawler control and training data policies.
             </p>
           </div>
 
           <div className="space-y-4">
             <h3 className="font-semibold">Resources</h3>
-            <div className="space-y-2">
-              <Button variant="link" className="h-auto p-0 text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+              <Button 
+                variant="link" 
+                className="h-auto p-0"
+                onClick={() => window.open('https://llmstxt.org/', '_blank')}
+              >
                 LLMS.txt Specification
               </Button>
-              <Button variant="link" className="h-auto p-0 text-muted-foreground">
-                Implementation Guide
+              <span className="opacity-70">|</span>
+              <Button 
+                variant="link" 
+                className="h-auto p-0"
+                asChild
+              >
+                <Link to="/how-it-works">Implementation Guide</Link>
               </Button>
-              <Button variant="link" className="h-auto p-0 text-muted-foreground">
-                Best Practices
+              <span className="opacity-70">|</span>
+              <Button 
+                variant="link" 
+                className="h-auto p-0"
+                asChild
+              >
+                <Link to="/terms-and-conditions">Terms & Conditions</Link>
+              </Button>
+              <span className="opacity-70">|</span>
+              <Button 
+                variant="link" 
+                className="h-auto p-0"
+                asChild
+              >
+                <Link to="/privacy-policy">Privacy Policy</Link>
               </Button>
             </div>
           </div>

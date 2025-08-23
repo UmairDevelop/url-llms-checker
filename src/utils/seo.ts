@@ -20,19 +20,19 @@ export const defaultSEO: SEOConfig = {
   keywords: ["LLMS.txt", "AI training data", "content licensing", "AI policies", "machine learning", "web standards"],
   ogType: "website",
   twitterCard: "summary_large_image",
-  ogImage: "https://lovable.dev/opengraph-image-p98pqg.png"
+  ogImage: "/placeholder.svg"
 };
 
 export const pageSEO = {
   home: {
-    title: "LLMS.txt Validator - Check AI Training Data Policies",
-    description: "Free tool to validate if websites have LLMS.txt files for AI training data policies and content licensing. Check compliance instantly.",
-    keywords: ["LLMS.txt validator", "AI training data", "content licensing", "machine learning policies"],
+    title: "LLMs.txt Validator - EzLLMsTxt",
+    description: "Use the LLMs.txt validator at ezllmstxt.com to check syntax, ensure compliance, and control AI crawlers. Validate your LLMs.txt file in seconds.",
+    keywords: ["llms.txt validator", "llms.txt checker", "AI training data", "content licensing"],
   },
   generator: {
-    title: "LLMS.txt Generator - Create AI Training Data Policy Files",
-    description: "Generate LLMS.txt files for your website to specify AI training data policies and content licensing preferences. Free online tool.",
-    keywords: ["LLMS.txt generator", "AI policy generator", "content licensing", "machine learning training data"],
+    title: "LLMs.txt Generator - EzLLMsTxt",
+    description: "Use our free LLMs.txt generator to control AI crawlers and protect your content. Quickly create, validate, and manage LLMs.txt files for your website.",
+    keywords: ["llms txt generator", "llms.txt generator", "AI policy generator", "content licensing", "machine learning training data"],
   }
 };
 

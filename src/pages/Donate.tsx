@@ -23,39 +23,39 @@ const cryptoOptions: CryptoOption[] = [
     name: "USDT (TetherUS)",
     symbol: "USDT",
     networks: [
-      { name: "Tron (TRC20)", code: "TRX", address: "TRX1234567890ABCDEF1234567890ABCDEF12345678" },
-      { name: "BSC (BEP20)", code: "BSC", address: "0x1234567890abcdef1234567890abcdef12345678" },
-      { name: "Ethereum (ERC20)", code: "ETH", address: "0xabcdef1234567890abcdef1234567890abcdef12" }
+      { name: "Tron (TRC-20)", code: "TRC-20", address: "TBVG6EG4r5XV39FpVRmHs4hDzH5QmUpvnN" },
+      { name: "BSC (BEP-20)", code: "BEP-20", address: "0x4022a3c62232fe95703c8c193ab033a42430c699" },
+      { name: "Ethereum (ERC-20)", code: "ERC-20", address: "0x4022a3c62232fe95703c8c193ab033a42430c699" }
     ]
   },
   {
     name: "BTC (Bitcoin)",
     symbol: "BTC",
     networks: [
-      { name: "Bitcoin", code: "BTC", address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh" },
-      { name: "BSC (BEP20)", code: "BSC", address: "0x9876543210fedcba9876543210fedcba98765432" }
+      { name: "Bitcoin", code: "BTC", address: "13THTxZbEhSAoTDkJxazX219jHP9mkCGN6" },
+      { name: "BEP-20", code: "BEP-20", address: "0x4022a3c62232fe95703c8c193ab033a42430c699" }
     ]
   },
   {
     name: "ETH (Ethereum)",
     symbol: "ETH",
     networks: [
-      { name: "Ethereum (ERC20)", code: "ETH", address: "0xfedcba0987654321fedcba0987654321fedcba09" },
-      { name: "BSC (BEP20)", code: "BSC", address: "0x5678901234abcdef5678901234abcdef56789012" }
+      { name: "Ethereum (ERC-20)", code: "ERC-20", address: "0x4022a3c62232fe95703c8c193ab033a42430c699" },
+      { name: "BEP-20", code: "BEP-20", address: "0x4022a3c62232fe95703c8c193ab033a42430c699" }
     ]
   },
   {
     name: "BNB (Binance Coin)",
     symbol: "BNB",
     networks: [
-      { name: "BNB Smart Chain (BEP20)", code: "BSC", address: "0xabcd1234efgh5678ijkl9012mnop3456qrst7890" }
+      { name: "BEP-20", code: "BEP-20", address: "0x4022a3c62232fe95703c8c193ab033a42430c699" }
     ]
   },
   {
     name: "SOL (Solana)",
     symbol: "SOL",
     networks: [
-      { name: "Solana", code: "SOL", address: "HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH" }
+      { name: "Solana", code: "SOL", address: "AQrx78sHuqroAiVx4dqTNxL3pUXaPVhu7AawVsZjXxWR" }
     ]
   }
 ];
@@ -108,7 +108,7 @@ const Donate = () => {
             </CardHeader>
             <CardContent className="text-center">
               <div className="bg-muted p-4 rounded-lg inline-block">
-                <span className="font-mono text-lg font-semibold">40020724</span>
+                <span className="font-mono text-lg font-semibold">1050080021</span>
               </div>
             </CardContent>
           </Card>

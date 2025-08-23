@@ -13,11 +13,14 @@ export const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img 
-            src="/lovable-uploads/0acd8fcf-ad8b-4d66-92a4-40994937b537.png" 
-            alt="ezllmstxt.com" 
-            className="h-8 w-auto"
-          />
+          <picture>
+            <source srcSet="/uploads/ezllmstxt-logo.webp" type="image/webp" />
+            <img 
+              src="/uploads/ezllmstxt-logo.png" 
+              alt="ezllmstxt.com" 
+              className="h-8 w-auto"
+            />
+          </picture>
         </Link>
 
         <div className="hidden md:flex items-center gap-4">
@@ -26,14 +29,14 @@ export const Header = () => {
             size="sm" 
             asChild
           >
-            <Link to="/">Validator</Link>
+            <Link to="/">LLMS.txt Generator</Link>
           </Button>
           <Button 
             variant={location.pathname === '/generator' ? 'default' : 'ghost'} 
             size="sm" 
             asChild
           >
-            <Link to="/generator">Generator</Link>
+            <Link to="/validator">LLMS.txt Validator</Link>
           </Button>
           <Button 
             variant={location.pathname === '/about' ? 'default' : 'ghost'} 
@@ -68,7 +71,7 @@ export const Header = () => {
                   asChild
                   onClick={() => setIsOpen(false)}
                 >
-                  <Link to="/">Validator</Link>
+                  <Link to="/">LLMS.txt Generator</Link>
                 </Button>
                 <Button 
                   variant={location.pathname === '/generator' ? 'default' : 'ghost'} 
@@ -76,7 +79,7 @@ export const Header = () => {
                   asChild
                   onClick={() => setIsOpen(false)}
                 >
-                  <Link to="/generator">Generator</Link>
+                  <Link to="/validator">LLMS.txt Validator</Link>
                 </Button>
                 <Button 
                   variant={location.pathname === '/about' ? 'default' : 'ghost'} 

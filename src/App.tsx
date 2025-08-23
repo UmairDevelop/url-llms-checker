@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Generator from "./pages/Generator";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Donate from "./pages/Donate";
@@ -26,8 +28,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Generator />} />
             <Route path="/generator" element={<Generator />} />
+            <Route path="/validator" element={<Index />} />
+            <Route path="/terms-and-conditions" element={<Terms />} />
+            <Route path="/privacy-policy" element={<Privacy />} />
             <Route path="/about" element={<About />} />
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/donate" element={<Donate />} />
