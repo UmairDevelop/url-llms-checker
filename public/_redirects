@@ -1,0 +1,11 @@
+# Netlify redirects file
+/*    /index.html   200
+
+# Handle SPA routing
+/donate /index.html 200
+/validator /index.html 200
+/generator /index.html 200
+/about /index.html 200
+/how-it-works /index.html 200
+/terms-and-conditions /index.html 200
+/privacy-policy /index.html 200
